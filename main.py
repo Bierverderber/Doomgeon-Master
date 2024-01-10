@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os
+import random
 
 pygame.init()
 width, height = 1200, 700
@@ -113,6 +114,7 @@ def boss_fight():   # Функция, отвечающая за битву с б
                     down = False
         DoomGuy_sprite.update(left, right, up, down)
         Bullets_sprites.update()
+        Cacodemon_sprite.update()
 
         pygame.display.flip()
         clock.tick(fps)
@@ -168,9 +170,33 @@ class Cacodemon(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 500
         self.rect.y = 350
+        self.positions = (random.randint(1, 1200 - self.image.get_width()),
+                          random.randint(1, 700 - self.image.get_height()))
+        self.v = 150
 
     def update(self):
-        pass
+        if self.positions[0] > self.rect.x:   # демон бегит
+            x_move = 1
+        else:
+            x_move = -1
+        if self.positions[1] > self.rect.y:
+            y_move = 1
+        else:
+            y_move = -1
+        if self.rect.x != self.positions[0] or self.rect.y != self.positions[1]:
+            if (x_move == 1 and self.rect.x + (self.v / fps) * x_move >= self.positions[0]) \
+                    or (x_move == -1 and self.rect.x + (self.v / fps) * x_move <= self.positions[0]):
+                self.rect.x = self.positions[0]
+            else:
+                self.rect.x = self.rect.x + (self.v / fps) * x_move
+            if (y_move == 1 and self.rect.y + (self.v / fps) * y_move >= self.positions[1]) \
+                    or (y_move == -1 and self.rect.y + (self.v / fps) * y_move <= self.positions[1]):
+                self.rect.y = self.positions[1]
+            else:
+                self.rect.y = self.rect.y + (self.v / fps) * y_move
+        else:
+            self.positions = (random.randint(1, 1200 - self.image.get_width()),
+                              random.randint(1, 700 - self.image.get_height()))
 
 
 class Aim(pygame.sprite.Sprite):
@@ -193,24 +219,40 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = start_pos_x
         self.rect.y = start_pos_y
-        self.start_x = start_pos_x
-        self.start_y = start_pos_y
-        self.end_x = end_pos[0]
-        self.end_y = end_pos[1]
-        self.hypotenuse = round((abs(self.start_x - self.end_x) ** 2 + abs(self.start_y - self.end_y) ** 2) ** 0.5)
-        self.k = round(self.hypotenuse / (200 / fps))
+        self.need_pos = (end_pos[0] - self.image.get_width() // 2, end_pos[1] - self.image.get_height() // 2)
+        self.v = 400
+        self.flag = True
+        if abs(self.need_pos[0] - self.rect.x) > abs(self.need_pos[1] - self.rect.y):
+            self.kostil = 0
+        else:
+            self.kostil = 1
+        if self.need_pos[0] > self.rect.x:
+            self.x_move = 1
+        else:
+            self.x_move = -1
+        if self.need_pos[1] > self.rect.y:
+            self.y_move = 1
+        else:
+            self.y_move = -1
 
     def update(self):
-        if self.start_x < self.end_x:
-            self.rect.x += (self.end_x - self.start_x) / self.k
+        if (self.rect.x != self.need_pos[0] or self.rect.y != self.need_pos[1]) and self.flag:  # пули летают
+            if (self.x_move == 1 and self.rect.x + (self.v / fps) * self.x_move >= self.need_pos[0]) \
+                    or (self.x_move == -1 and self.rect.x + (self.v / fps) * self.x_move <= self.need_pos[0]):
+                self.rect.x = self.need_pos[0]
+            else:
+                self.rect.x = self.rect.x + (self.v / fps) * self.x_move
+            if (self.y_move == 1 and self.rect.y + (self.v / fps) * self.y_move >= self.need_pos[1]) \
+                    or (self.y_move == -1 and self.rect.y + (self.v / fps) * self.y_move <= self.need_pos[1]):
+                self.rect.y = self.need_pos[1]
+            else:
+                self.rect.y = self.rect.y + (self.v / fps) * self.y_move
         else:
-            self.rect.x -= (self.start_x - self.end_x) / self.k
-        if self.start_y < self.end_y:
-            self.rect.y += (self.end_y - self.start_y) / self.k
-        else:
-            self.rect.y -= (self.start_x - self.end_y) / self.k
-        if 0 > self.rect.x or self.rect.x > 1200 or 0 > self.rect.y or self.rect.y > 700:
-            self.kill()
+            self.flag = False
+            if self.kostil == 0:
+                self.rect.x = self.rect.x + (self.v / fps) * self.x_move
+            else:
+                self.rect.y = self.rect.y + (self.v / fps) * self.y_move
 
 
 
