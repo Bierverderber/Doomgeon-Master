@@ -170,8 +170,8 @@ class Cacodemon(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 500
         self.rect.y = 350
-        self.positions = (random.randint(1, 1200 - self.image.get_width()),
-                          random.randint(1, 700 - self.image.get_height()))
+        self.positions = (random.randint(1, width - self.image.get_width()),
+                          random.randint(1, height - self.image.get_height()))
         self.v = 150
 
     def update(self):
@@ -195,8 +195,8 @@ class Cacodemon(pygame.sprite.Sprite):
             else:
                 self.rect.y = self.rect.y + (self.v / fps) * y_move
         else:
-            self.positions = (random.randint(1, 1200 - self.image.get_width()),
-                              random.randint(1, 700 - self.image.get_height()))
+            self.positions = (random.randint(1, width - self.image.get_width()),
+                              random.randint(1, height - self.image.get_height()))
 
 
 class Aim(pygame.sprite.Sprite):
