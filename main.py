@@ -46,7 +46,7 @@ def terminate():
 
 
 def start_screen():   # функция, отвечающая за главное меню
-    fon = pygame.transform.scale(load_image('doomfon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('hellfon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
     PlayButton()
     Logo()
@@ -123,10 +123,10 @@ def boss_fight():   # Функция, отвечающая за битву с б
 class PlayButton(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(PlayButton_sprite, all_sprites)
-        self.image = pygame.transform.scale(load_image('playbutton.png'), (130, 100))
+        self.image = pygame.transform.scale(load_image('playbutton.png'), (300, 125))
         self.rect = self.image.get_rect()
         self.rect.x = width // 2 - self.image.get_width() // 2
-        self.rect.y = 500
+        self.rect.y = 550
 
     def update(self, *args):
         global LetsGo
