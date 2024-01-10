@@ -65,7 +65,7 @@ def start_screen():   # функция, отвечающая за главное
 
 def boss_fight():   # Функция, отвечающая за битву с боссом
     global isMouseFocused
-    fon = pygame.transform.scale(load_image('floor.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('hellfloor.png'), (width, height))
     screen.blit(fon, (0, 0))
 
     doomguy = DoomGuy()
