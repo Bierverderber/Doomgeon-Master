@@ -176,6 +176,14 @@ class DoomGuy(pygame.sprite.Sprite):
         if doomguyhb.hp <= 0:
             self.kill()
             Lose = True
+        if self.rect.x < 0:
+            self.rect.x = 0
+        elif self.rect.x > width - self.image.get_width():
+            self.rect.x = width - self.image.get_width()
+        if self.rect.y < 0:
+            self.rect.y = 0
+        elif self.rect.y > height - self.image.get_height():
+            self.rect.y = height - self.image.get_height()
 
 
 class Cacodemon(pygame.sprite.Sprite):
