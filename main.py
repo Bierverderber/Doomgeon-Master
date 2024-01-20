@@ -39,6 +39,7 @@ Aim_sprite = pygame.sprite.Group()
 EnemyBullets_sprites = pygame.sprite.Group()
 LetsGo = False
 Lose = False
+Win = False
 isMouseFocused = True
 
 
@@ -78,7 +79,7 @@ def boss_fight():   # Функция, отвечающая за битву с б
 
     left = right = up = down = False
 
-    while not Lose:
+    while not (Lose or Win):
         if str(EnemyBullets_sprites)[7] == '0':
             cacodemon.attack(EnemyBullet)
         screen.fill('black')
@@ -121,7 +122,7 @@ def boss_fight():   # Функция, отвечающая за битву с б
                     up = False
                 elif event.key in [pygame.K_DOWN, pygame.K_s]:
                     down = False
-        DoomGuy_sprite.update(left, right, up, down, doomguyhb)
+        DoomGuy_sprite.update(left, right, up, down, doomguyhb, cacodemon)
         Bullets_sprites.update(cacodemon, health_bar)
         EnemyBullets_sprites.update(doomguy, doomguyhb)
         Cacodemon_sprite.update(health_bar)
@@ -163,7 +164,7 @@ class DoomGuy(pygame.sprite.Sprite):
         self.rect.x = 100
         self.rect.y = 100
 
-    def update(self, left, right, up, down, doomguyhb):
+    def update(self, left, right, up, down, doomguyhb, cacodemon):
         global Lose
         if left:
             self.rect.x -= 300 / fps
@@ -184,6 +185,8 @@ class DoomGuy(pygame.sprite.Sprite):
             self.rect.y = 0
         elif self.rect.y > height - self.image.get_height():
             self.rect.y = height - self.image.get_height()
+        if pygame.sprite.spritecollideany(self, Cacodemon_sprite):
+            doomguyhb.hp -= 1
 
 
 class Cacodemon(pygame.sprite.Sprite):
