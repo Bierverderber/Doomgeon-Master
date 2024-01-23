@@ -412,7 +412,7 @@ class Victory(pygame.sprite.Sprite):
         super().__init__(all_sprites, Victory_sprite)
         self.image = pygame.transform.scale(load_image('Victory.png'), (1000, 100))
         self.rect = self.image.get_rect()
-        self.rect.x = width // 2 - self.image.get_width() // 2 + 270
+        self.rect.x = width // 2 - self.image.get_width() // 2 + 285
         self.rect.y = 600
 
 
