@@ -4,6 +4,7 @@ import os
 import random
 
 pygame.init()
+pygame.mixer.init()
 width, height = 1200, 700
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Doomgeon Master')
@@ -26,6 +27,11 @@ def load_image(name, colorkey=None):
     return image
 
 
+def play_music(song):
+    pygame.mixer.music.load(song)
+    pygame.mixer.music.play()
+
+
 fps = 60
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
@@ -37,6 +43,7 @@ Cacodemon_sprite = pygame.sprite.Group()
 Bullets_sprites = pygame.sprite.Group()
 Aim_sprite = pygame.sprite.Group()
 EnemyBullets_sprites = pygame.sprite.Group()
+Victory_sprite = pygame.sprite.Group()
 LetsGo = False
 Lose = False
 Win = False
@@ -74,7 +81,7 @@ def boss_fight():   # Функция, отвечающая за битву с б
     doomguy = DoomGuy()
     cacodemon = Cacodemon()
     Aim()
-    health_bar = HealthBar(250, 650, 700, 20, 250)
+    health_bar = HealthBar(250, 650, 700, 20, 5)
     doomguyhb = HealthBar(50, 50, 200, 20, 5)
 
     left = right = up = down = False
@@ -159,7 +166,7 @@ class Logo(pygame.sprite.Sprite):
 class DoomGuy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(DoomGuy_sprite, BossFight_sprites, all_sprites)
-        self.image = pygame.transform.scale(load_image('DoomGuy.png'), (150, 150))
+        self.image = pygame.transform.scale(load_image('doom_GAY.png'), (60, 80))
         self.rect = self.image.get_rect()
         self.rect.x = 100
         self.rect.y = 100
@@ -175,6 +182,7 @@ class DoomGuy(pygame.sprite.Sprite):
         if down:
             self.rect.y += 300 / fps
         if doomguyhb.hp <= 0:
+            play_music('data/Tyler1.mp3')
             self.kill()
             Lose = True
         if self.rect.x < 0:
@@ -186,7 +194,9 @@ class DoomGuy(pygame.sprite.Sprite):
         elif self.rect.y > height - self.image.get_height():
             self.rect.y = height - self.image.get_height()
         if pygame.sprite.spritecollideany(self, Cacodemon_sprite):
-            doomguyhb.hp -= 1
+            if (cacodemon.rect.x + 70 < self.rect.x < cacodemon.rect.x + 210 and
+                    cacodemon.rect.y + 85 < self.rect.y < cacodemon.rect.y + 220):
+                doomguyhb.hp -= 1
 
 
 class Cacodemon(pygame.sprite.Sprite):
@@ -203,6 +213,7 @@ class Cacodemon(pygame.sprite.Sprite):
         self.hp = 20
 
     def update(self, health_bar):
+        global Win
         if self.positions[0] > self.rect.x:   # демон бегит
             x_move = 1
         else:
@@ -227,6 +238,8 @@ class Cacodemon(pygame.sprite.Sprite):
                               random.randint(1, height - self.image.get_height()))
         if health_bar.hp <= 0:
             self.kill()
+            play_music('data/areuawiningson.mp3')
+            Win = True
 
     def attack(self, EnemyBullet):
         num_attack = random.randint(1, 3)
@@ -244,21 +257,27 @@ class Cacodemon(pygame.sprite.Sprite):
 
     def attack2(self, EnemyBullet):
         for j in range(5):
-            for i in range(3):
+            for i in range(4):
                 EnemyBullet(- 70 * j, i * (height // 4) + 40, 1)
 
     def attack3(self, EnemyBullet):
         EnemyBullet1 = EnemyBullet(0, 0, -2)
         EnemyBullet1.image = pygame.transform.scale(load_image('EnemyBullet.png'), (300, 300))
         EnemyBullet1.rect = EnemyBullet1.image.get_rect()
-        EnemyBullet1.rect.x = 100
+        EnemyBullet1.rect.x = 50
         EnemyBullet1.rect.y = 800
 
         EnemyBullet2 = EnemyBullet(0, 0, -2)
         EnemyBullet2.image = pygame.transform.scale(load_image('EnemyBullet.png'), (300, 300))
         EnemyBullet2.rect = EnemyBullet2.image.get_rect()
-        EnemyBullet2.rect.x = 700
+        EnemyBullet2.rect.x = 450
         EnemyBullet2.rect.y = 800
+
+        EnemyBullet3 = EnemyBullet(0, 0, -2)
+        EnemyBullet3.image = pygame.transform.scale(load_image('EnemyBullet.png'), (300, 300))
+        EnemyBullet3.rect = EnemyBullet2.image.get_rect()
+        EnemyBullet3.rect.x = 850
+        EnemyBullet3.rect.y = 800
 
 
 class Aim(pygame.sprite.Sprite):
@@ -296,6 +315,7 @@ class Bullet(pygame.sprite.Sprite):
             self.y_move = 1
         else:
             self.y_move = -1
+        play_music('data/piu.wav')
 
     def update(self, cacodemon, health_bar):
         if (self.rect.x != self.need_pos[0] or self.rect.y != self.need_pos[1]) and self.flag:  # пули летают
@@ -362,11 +382,43 @@ class EnemyBullet(pygame.sprite.Sprite):
             self.kill()
 
 
+def win():
+    fon = pygame.transform.scale(load_image('winfon.jpg'), (width, height))
+    screen.blit(fon, (0, 0))
+    Victory()
+    Victory_sprite.draw(screen)
+
+    pygame.display.flip()
+    pygame.mouse.set_visible(True)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
 
 
+def lose():
+    fon = pygame.transform.scale(load_image('uded.png'), (width, height))
+    screen.blit(fon, (0, 0))
+    pygame.mouse.set_visible(True)
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
 
 
+class Victory(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(all_sprites, Victory_sprite)
+        self.image = pygame.transform.scale(load_image('Victory.png'), (1000, 100))
+        self.rect = self.image.get_rect()
+        self.rect.x = width // 2 - self.image.get_width() // 2 + 270
+        self.rect.y = 600
 
 
 start_screen()
 boss_fight()
+if Win:
+    win()
+elif Lose:
+    lose()
