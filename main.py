@@ -372,6 +372,7 @@ class EnemyBullet(pygame.sprite.Sprite):
 
     def update(self, doomguy, doomguyhb):
         if pygame.sprite.spritecollideany(self, DoomGuy_sprite):
+            play_music('data/aubolno.mp3')
             self.kill()
             doomguyhb.hp -= 1
         if self.need_move in (-1, 1):
